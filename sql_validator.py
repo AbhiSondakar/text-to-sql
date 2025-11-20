@@ -15,7 +15,7 @@ FORBIDDEN_KEYWORDS = {
 
 # Maximum allowed query complexity
 MAX_JOINS = 5
-MAX_SUBQUERIES = 3
+MAX_SUBQUERIES = 10
 DEFAULT_LIMIT = 1000
 
 
