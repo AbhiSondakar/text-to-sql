@@ -9,7 +9,6 @@ import database
 from models import ChatSession, ChatMessage
 import ai_service
 import sql_validator
-from test import sql_executor
 from visualization_service import VisualizationService
 
 
