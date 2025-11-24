@@ -278,5 +278,3 @@ If you encounter issues not covered in this guide:
 3. Open an issue on the project repository with detailed error messages
 
 ---
-
-**Happy querying! 🎉**
