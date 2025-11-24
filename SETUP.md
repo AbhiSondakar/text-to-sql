@@ -72,18 +72,66 @@ streamlit run app.py
 
 ---
 
-## ⚙️ Manual Configuration
+## ⚙️ Manual Configuration (Detailed)
 
-If you prefer to set up the environment manually, follow these steps.
+If you are setting this up manually (e.g., in a production environment or without the Python script), follow these strict database permission guidelines.
 
-### 1. Database Setup
+### 1. Database Creation
 
-You need two PostgreSQL databases:
+Connect to your PostgreSQL instance (e.g., using `psql` or pgAdmin) and create two databases:
 
-- **Application DB** (`text_to_sql_db`): Stores chat sessions. (User needs INSERT/UPDATE/SELECT permissions)
-- **Data DB** (`Student`): Stores the business data to be queried. (User MUST be READ ONLY to prevent SQL injection)
+```sql
+CREATE DATABASE text_to_sql_db;  -- Stores chat history
+CREATE DATABASE Student;         -- Stores your business data
+```
 
-### 2. Environment Variables (.env)
+### 2. User & Permission Setup (Crucial)
+
+#### A. Setup Chat DB User (CRUD Access)
+
+This user needs full control over the `text_to_sql_db` to store messages, sessions, and logs.
+
+```sql
+-- 1. Create the application user
+CREATE USER app_user WITH PASSWORD 'secure_app_pass_123!';
+
+-- 2. Connect to the 'text_to_sql_db' database
+\c text_to_sql_db
+
+-- 3. Grant CRUD permissions
+GRANT ALL PRIVILEGES ON DATABASE text_to_sql_db TO app_user;
+GRANT ALL PRIVILEGES ON SCHEMA public TO app_user;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO app_user;
+
+-- 4. Ensure future tables are also accessible
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO app_user;
+```
+
+#### B. Setup Data DB User (Read-Only Access)
+
+This user MUST be read-only. The AI uses this account to query your data. If this user has write access, the AI could accidentally modify or delete your data.
+
+```sql
+-- 1. Create the read-only user
+CREATE USER readonly_user WITH PASSWORD 'secure_readonly_pass_123!';
+
+-- 2. Connect to the 'Student' database (or your data database)
+\c Student
+
+-- 3. Grant CONNECT and SELECT only
+GRANT CONNECT ON DATABASE Student TO readonly_user;
+GRANT USAGE ON SCHEMA public TO readonly_user;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly_user;
+
+-- 4. Ensure future tables are readable
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO readonly_user;
+
+-- 5. SAFETY NET: Explicitly revoke write permissions
+REVOKE INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER
+ON ALL TABLES IN SCHEMA public FROM readonly_user;
+```
+
+### 3. Environment Variables (.env)
 
 Create a `.env` file in the root directory.
 
@@ -213,6 +261,9 @@ If you see rate limit errors (especially with Free tiers):
 - **API Provider Documentation:**
   - [Groq Console](https://console.groq.com/)
   - [OpenRouter](https://openrouter.ai/docs)
+  - [Google Gemini](https://ai.google.dev/)
+  - [Anthropic Claude](https://docs.anthropic.com/)
+  - [DeepSeek](https://platform.deepseek.com/)
   
 - **PostgreSQL Setup:** [Official Installation Guide](https://www.postgresql.org/download/)
 
@@ -227,3 +278,5 @@ If you encounter issues not covered in this guide:
 3. Open an issue on the project repository with detailed error messages
 
 ---
+
+**Happy querying! 🎉**
