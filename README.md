@@ -1,4 +1,4 @@
-# 🤖 NLP-Powered Conversational Assistant
+# 🤖 NLP-Powered Conversational Assistant to Database
 
 A production-ready Text-to-SQL Agent that empowers users to query their databases using natural language. Built with Streamlit, PostgreSQL, and a robust Two-Agent AI System (Generator & Validator), this tool ensures accurate SQL generation and provides automatic data visualization.
 
